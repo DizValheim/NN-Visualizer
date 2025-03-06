@@ -22,7 +22,7 @@ def train_model():
     x_train = np.array([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=np.float32)
     y_train = np.array([[0], [1], [1], [0]], dtype=np.float32)
 
-    for epoch in range(1, 1001):
+    for epoch in range(1, 2001):
         with tf.GradientTape() as tape:
             # Forward Propagation
             x_input = tf.convert_to_tensor(x_train, dtype=tf.float32)
@@ -49,4 +49,4 @@ def train_model():
             "gradients": [g.numpy().tolist() for g in gradients]
         })
 
-        socketio.sleep(0.5)
+        socketio.sleep(0.01)

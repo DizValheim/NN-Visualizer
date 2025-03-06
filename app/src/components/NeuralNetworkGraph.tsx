@@ -10,9 +10,8 @@ interface NeuralNetworkGraphProps {
 
 function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
-  const [layers, setLayers] = useState(props.layers);
+  const [layers, _setLayers] = useState(props.layers);
   const [weights, setWeights] = useState<any>(null);
-
   const [loss, setLoss] = useState(0);
   const [epoch, setEpoch] = useState(0);
 
@@ -55,7 +54,7 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
             .attr("y1", sourceNeuron.y)
             .attr("x2", targetNeuron.x)
             .attr("y2", targetNeuron.y)
-            .attr("stroke", weights ? getColor(weights[layer][i][j]) : "white")
+            .attr("stroke", weights ? getColor(weights[layer]?.[i]?.[j] ?? 0) : "white")
             .attr("stroke-width", 2)
             .lower();
         });
@@ -63,7 +62,7 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
     }
 
     //Draw Neurons
-    layers.forEach((neurons, layerIndex) => {
+    layers.forEach((_neurons, layerIndex) => {
       neuronPositions[layerIndex].forEach(({ x, y }) => {
         svg
           .append("circle")
@@ -71,7 +70,7 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
           .attr("cy", y)
           .attr("r", neuronRadius)
           .attr("fill", "steelblue")
-          .attr("stroke", "black")
+          .attr("stroke", "white")
           .raise();
       });
     });
@@ -112,7 +111,7 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
     <div className="relative w-1/2 mx-auto outline-2 outline-blue-900">
       <div className="h-1/10 flex justify-between">
         <span>Epoch: {epoch}</span>
-        <span className="m-1">Loss: {loss}</span>
+        <span className="m-1">Loss: {loss.toFixed(4)}</span>
         <button
           className="m-1 rounded-md p-1 outline-2 hover:outline-blue-500 cursor-pointer"
           onClick={startTraining}
