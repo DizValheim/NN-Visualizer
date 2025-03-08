@@ -4,4 +4,11 @@
 @theme {
     --font-lato: "Lato", sans-serif;
     --font-playwrite: "Playwrite US Modern", cursive;
+
+    --animate-pulse-slow: pulse 10s ease-in-out infinite;
+    @keyframes wiggle {
+        50% {
+            opacity: 0.5;
+        }
+    }
 }

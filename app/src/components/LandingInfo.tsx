@@ -1,7 +1,7 @@
 function LandingInfo() {
   return (
-    <div className="flex flex-col justify-center">
-      <div className="w-1/2 mx-auto my-auto">
+    <div className="sticky top-0 left-0 flex flex-col justify-center h-dvh">
+      <div className=" w-1/2 mx-auto">
         <h1 className="mt-10 text-4xl text-gray-500">
           Visualization Tool:{" "}
           <span className="text-blue-800">Neural Network!</span>
