@@ -18,7 +18,6 @@ function Slider() {
 
   const handleScroll = () => {
     setScrollPosition(window.scrollY);
-    console.log(scrollPosition);
     
     const triggerPoint = window.innerHeight / 2; 
     
