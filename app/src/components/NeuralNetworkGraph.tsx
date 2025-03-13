@@ -7,6 +7,10 @@ const socket = io("http://localhost:3000");
 interface NeuralNetworkGraphProps {
   layers: number[]; // Example: [2, 4, 1] for a 2-input, 1-output NN
 }
+// interface NeuralNetworkUpdate {
+//   epoch: number;
+//   weights: (number[][] | number[])[];
+// }
 
 function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -14,6 +18,7 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
   const [weights, setWeights] = useState<any>(null);
   const [loss, setLoss] = useState(0);
   const [epoch, setEpoch] = useState(0);
+  const [isTraining, setIsTraining] = useState(false);
 
   useEffect(() => {
     if (!svgRef.current) return;
@@ -54,7 +59,10 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
             .attr("y1", sourceNeuron.y)
             .attr("x2", targetNeuron.x)
             .attr("y2", targetNeuron.y)
-            .attr("stroke", weights ? getColor(weights[layer]?.[i]?.[j] ?? 0) : "white")
+            .attr(
+              "stroke",
+              weights ? getColor(weights[layer]?.[i]?.[j] ?? 0) : "white"
+            )
             .attr("stroke-width", 2)
             .lower();
         });
@@ -94,9 +102,33 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
     };
   }, []);
 
+  useEffect(() => {
+    socket.on("trainingReset", () => {
+      setEpoch(0);
+      setWeights(null);
+      setLoss(0);
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("trainStep");
+      socket.off("trainingReset");
+      socket.off("connect_error");
+      if (socket.connected) {
+        socket.close();
+      }
+    };
+  }, []);
+
   function startTraining() {
     console.log("Emitting trainNN event...");
     socket.emit("trainNN");
+    setIsTraining(true);
+  }
+
+  function resetTraining() {
+    socket.emit("resetTraining");
+    setIsTraining(false);
   }
 
   function getColor(weight: number) {
@@ -114,9 +146,9 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
         <span className="m-1">Loss: {loss.toFixed(4)}</span>
         <button
           className="m-1 rounded-md p-1 outline-2 hover:outline-blue-500 cursor-pointer"
-          onClick={startTraining}
+          onClick={isTraining ? resetTraining : startTraining}
         >
-          Start Training
+          {isTraining ? "Reset Training" : "Start Training"}
         </button>
       </div>
       <div className="my-10 ">

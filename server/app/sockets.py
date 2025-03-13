@@ -18,11 +18,18 @@ def handle_disconnect():
 
 @socketio.on('trainNN')
 def train_model():
+    global stop_training
+    stop_training = False
+
     print("Training...")
     x_train = np.array([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=np.float32)
     y_train = np.array([[0], [1], [1], [0]], dtype=np.float32)
 
     for epoch in range(1, 2001):
+        if(stop_training):
+            print("Training stopped.")
+            return
+
         with tf.GradientTape() as tape:
             # Forward Propagation
             x_input = tf.convert_to_tensor(x_train, dtype=tf.float32)
@@ -50,3 +57,18 @@ def train_model():
         })
 
         socketio.sleep(0.01)
+
+@socketio.on("resetTraining")
+def reset_training():
+    global stop_training
+    stop_training = True
+    print("Stop training requested...")
+
+    # Reset weights
+    for layer in model.layers:
+        if hasattr(layer, "kernel_initializer"):
+            layer.kernel.assign(layer.kernel_initializer(tf.shape(layer.kernel)))
+        if hasattr(layer, "bias_initializer"):
+            layer.bias.assign(layer.bias_initializer(tf.shape(layer.bias)))
+
+    socketio.emit("trainingReset")
