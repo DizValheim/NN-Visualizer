@@ -151,8 +151,28 @@ function NeuralNetworkGraph(props: NeuralNetworkGraphProps) {
           {isTraining ? "Reset Training" : "Start Training"}
         </button>
       </div>
-      <div className="my-10 ">
+      <div className=" ">
         <svg className="transition-all ease-in-out" ref={svgRef}></svg>
+      </div>
+      <div className="grid grid-cols-2 mb-5">
+        {weights?.map((variable: number[][] | number[], index: number) => {
+          const flatVariable: number[] = variable.flat();
+          const isWeight = index % 2 === 0;
+          return (
+            <div className="m-2">
+                <strong>Layer {Math.floor(index / 2)} {(isWeight) ? "Weights" : "Biases"}:</strong>
+                <div className={`grid grid-cols-${weights.length}`} key={index}>
+                  {flatVariable.map((weight: number, i: number) => {
+                    return (
+                      <span>
+                        <strong>{(isWeight) ? "W" : "B"}-{i}: </strong> {weight.toFixed(4)}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+          );
+        })}
       </div>
     </div>
   );
